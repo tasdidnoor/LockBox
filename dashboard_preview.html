@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LockBox Dashboard Preview</title>
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --secondary-text: #86868b;
+            --card-bg: #1c1c1e;
+            --accent-color: #007aff;
+            --bolt-color: #ffd60a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            padding-top: 5px;
+        }
+
+        /* --- Menu System --- */
+        .top-nav {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            margin-bottom: 0;
+        }
+
+        .menu-btn {
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 5px;
+        }
+
+        .menu-btn span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: white;
+            border-radius: 2px;
+        }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 200;
+            padding: 60px 24px;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-right: 1px solid #333;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+        }
+
+        .side-menu.active { left: 0; }
+
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 150;
+        }
+
+        .profile-section h3 { 
+            font-size: 24px; 
+            font-weight: 700;
+            margin-bottom: 25px; 
+            color: #fff;
+        }
+
+        .friend-item { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 18px; 
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .friend-streak { color: var(--bolt-color); font-weight: 700; }
+
+        /* --- Layout --- */
+        header h1 { 
+            font-size: 22px; 
+            font-weight: 600; 
+            letter-spacing: -0.5px;
+            margin-left: 15px;
+        }
+
+        .mascot-container {
+            width: 200px;
+            height: 200px;
+            margin: 10px auto;
+            background: #111;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #333;
+            overflow: hidden;
+        }
+
+        .mascot-image { width: 100%; height: 100%; object-fit: contain; }
+
+        .timer-container { text-align: center; margin-bottom: 15px; }
+        .timer { font-size: 84px; font-weight: 700; letter-spacing: -2px; font-variant-numeric: tabular-nums; }
+
+        .status-card {
+            background-color: var(--card-bg);
+            width: 90%;
+            max-width: 350px;
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .product-image-placeholder {
+            width: 80px;
+            height: 80px;
+            background: #2c2c2e;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .status-info { display: flex; flex-direction: column; gap: 4px; }
+        .status-label { font-size: 13px; color: var(--secondary-text); text-transform: uppercase; font-weight: 600; }
+        .status-value { font-size: 20px; font-weight: 600; }
+        .streak-7d { font-size: 14px; color: var(--secondary-text); margin-top: 4px; }
+
+        /* --- Seamless Banner --- */
+        .banner-wrap {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #111;
+            padding: 18px 0;
+            border-top: 1px solid #222;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .banner-content {
+            display: inline-block;
+            animation: scroll 40s linear infinite;
+        }
+
+        .banner-stat {
+            display: inline-block;
+            margin-right: 60px;
+            font-size: 15px;
+            color: var(--secondary-text);
+            font-weight: 500;
+        }
+
+        .banner-stat span { color: var(--bolt-color); font-weight: 700; }
+
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .unlocked { color: #32d74b; }
+        .locked { color: #ff453a; }
+    </style>
+</head>
+<body>
+
+    <div class="menu-overlay" id="overlay" onclick="toggleMenu()"></div>
+    
+    <div class="side-menu" id="menu">
+        <div class="profile-section">
+            <h3>Me</h3>
+            <div class="friend-item">
+                <span>Focus Streak</span>
+                <span class="friend-streak">7 Days ⚡</span>
+            </div>
+            <div class="friend-item" style="border-top: 1px solid #333; padding-top: 20px; margin-top: 25px;">
+                <span style="color: var(--secondary-text); font-size: 13px; text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Friends</span>
+            </div>
+            <div id="friendsList"></div>
+        </div>
+    </div>
+
+    <nav class="top-nav">
+        <div class="menu-btn" onclick="toggleMenu()">
+            <span></span><span></span><span></span>
+        </div>
+        <header><h1>LockBox</h1></header>
+        <div style="width:34px"></div>
+    </nav>
+
+    <div class="mascot-container">
+        <img id="petImage" class="mascot-image" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" alt="Pet">
+    </div>
+
+    <div class="timer-container">
+        <div class="timer" id="timer">25:00</div>
+    </div>
+
+    <div class="status-card">
+        <div class="product-image-placeholder">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2">
+                <path d="M21 8l-9-4-9 4v8l9 4 9-4V8zM12 4v16M3 8l9 4 9-4"/>
+            </svg>
+        </div>
+        <div class="status-info">
+            <span class="status-label">Status</span>
+            <span class="status-value unlocked" id="lock-status">UNLOCKED</span>
+            <span class="streak-7d" id="streakDisplay">7D Streak: 7 days</span>
+        </div>
+    </div>
+
+    <div class="banner-wrap">
+        <div class="banner-content" id="banner"></div>
+    </div>
+
+    <script>
+        const FRIENDS = [
+            { name: "Alex", streak: 12 },
+            { name: "Sam", streak: 5 },
+            { name: "Jordan", streak: 21 },
+            { name: "Riley", streak: 8 },
+            { name: "Taylor", streak: 14 }
+        ];
+
+        function toggleMenu() {
+            const menu = document.getElementById('menu');
+            const overlay = document.getElementById('overlay');
+            menu.classList.toggle('active');
+            overlay.style.display = menu.classList.contains('active') ? 'block' : 'none';
+        }
+
+        function init() {
+            const list = document.getElementById('friendsList');
+            const banner = document.getElementById('banner');
+            let bannerHTML = "";
+
+            FRIENDS.forEach(f => {
+                list.innerHTML += `<div class="friend-item"><span>${f.name}</span><span class="friend-streak">${f.streak}⚡</span></div>`;
+                bannerHTML += `<span class="banner-stat">${f.name} is focusing! <span>${f.streak}D Streak</span></span>`;
+            });
+            
+            // Duplicate content twice for extra smoothness and no gaps
+            banner.innerHTML = bannerHTML + bannerHTML + bannerHTML;
+        }
+
+        // Mock updates for preview
+        let timeLeft = 1500;
+        setInterval(() => {
+            if(timeLeft > 0) timeLeft--;
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            document.getElementById('timer').innerText = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+        }, 1000);
+
+        init();
+    </script>
+</body>
+</html>

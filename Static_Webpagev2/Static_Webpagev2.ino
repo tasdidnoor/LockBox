@@ -1,0 +1,216 @@
+#include <WiFi.h>
+#include <WebServer.h>
+
+// Wi-Fi Settings
+const char* ssid = "LockBox_AP";
+const char* password = "NT4T5";
+
+// Web server
+WebServer server(80);
+
+// Pin definitions for ESP32-C3 Mini
+#define RX_PIN 3
+#define TX_PIN 4
+
+// Global Status variables
+int minutesRemaining = 0;
+int secondsRemaining = 0;
+int boxState = 0;
+int emergencyCount = 0;
+bool isLocked = false;
+unsigned long lastPacketTime = 0;
+
+void setup() {
+  // Serial1 for hardware communication with Grove board
+  Serial1.begin(115200, SERIAL_8N1, RX_PIN, TX_PIN);
+  Serial1.setTimeout(5); // Ultra-fast timeout to prevent web server lag
+  
+  // Serial for USB debugging
+  Serial.begin(115200);
+  
+  WiFi.softAP(ssid, password);
+  
+  server.on("/", handleRoot);
+  server.on("/api/status", handleAPI);
+  server.begin();
+}
+
+void loop() {
+  server.handleClient();
+  
+  // STABILITY: Clear old data from the buffer to prevent lagging
+  while (Serial1.available() > 64) { 
+    Serial1.read(); 
+  }
+  
+  // Read data from Grove Board
+  if (Serial1.available()) {
+    String data = Serial1.readStringUntil('\n');
+    if (data.startsWith("STATUS:")) {
+      parseSerialData(data);
+      lastPacketTime = millis();
+    }
+  }
+}
+
+void parseSerialData(String data) {
+  data.trim();
+  data.remove(0, 7);
+  int firstBar = data.indexOf('|');
+  int secondBar = data.indexOf('|', firstBar + 1);
+  int thirdBar = data.indexOf('|', secondBar + 1);
+  int fourthBar = data.indexOf('|', thirdBar + 1);
+  
+  if (firstBar > 0 && secondBar > 0 && thirdBar > 0 && fourthBar > 0) {
+    minutesRemaining = data.substring(0, firstBar).toInt();
+    secondsRemaining = data.substring(firstBar + 1, secondBar).toInt();
+    boxState = data.substring(secondBar + 1, thirdBar).toInt();
+    emergencyCount = data.substring(thirdBar + 1, fourthBar).toInt();
+    isLocked = data.substring(fourthBar + 1).toInt() == 1;
+  }
+}
+
+void handleAPI() {
+  // STABILITY: Force laptop browsers to close connection and not cache data
+  server.sendHeader("Connection", "close");
+  server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+  
+  String json = "{";
+  json += "\"minutes\":" + String(minutesRemaining) + ",";
+  json += "\"seconds\":" + String(secondsRemaining) + ",";
+  json += "\"state\":" + String(boxState) + ",";
+  json += "\"emergencyCount\":" + String(emergencyCount) + ",";
+  json += "\"isLocked\":" + String(isLocked ? "true" : "false") + ",";
+  json += "\"lastUpdate\":" + String(millis() - lastPacketTime);
+  json += "}";
+  server.send(200, "application/json", json);
+}
+
+void handleRoot() {
+  // STABILITY: Prevent persistent connections from laptop browsers
+  server.sendHeader("Connection", "close");
+  
+  String html = R"rawliteral(
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LockBox Dashboard</title>
+    <style>
+        :root { --bg-color: #000000; --text-color: #ffffff; --secondary-text: #86868b; --card-bg: #1c1c1e; --accent-color: #007aff; --bolt-color: #ffd60a; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); min-height: 100vh; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; padding-top: 5px; }
+        .top-nav { width: 100%; display: flex; align-items: center; padding: 15px 20px; margin-bottom: 0; position: relative; }
+        .menu-btn { cursor: pointer; z-index: 100; display: flex; flex-direction: column; gap: 5px; padding: 5px; }
+        .menu-btn span { display: block; width: 24px; height: 2px; background: white; border-radius: 2px; }
+        .side-menu { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(20px); z-index: 200; padding: 60px 24px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); border-right: 1px solid #333; }
+        .side-menu.active { left: 0; }
+        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; z-index: 150; }
+        .profile-section h3 { font-size: 24px; font-weight: 700; margin-bottom: 25px; color: #fff; }
+        .friend-item { display: flex; justify-content: space-between; margin-bottom: 18px; font-size: 16px; font-weight: 500; }
+        .friend-streak { color: var(--bolt-color); font-weight: 700; }
+        header h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; margin-left: 15px; }
+        .mascot-container { width: 200px; height: 200px; margin: 10px auto; background: #111; border-radius: 20px; display: flex; justify-content: center; align-items: center; border: 1px solid #333; overflow: hidden; }
+        .mascot-image { width: 100%; height: 100%; object-fit: contain; }
+        .timer-container { text-align: center; margin-bottom: 15px; min-height: 100px; display: flex; align-items: center; justify-content: center; }
+        .timer { font-size: 84px; font-weight: 700; letter-spacing: -2px; font-variant-numeric: tabular-nums; }
+        .status-card { background-color: var(--card-bg); width: 90%; max-width: 350px; border-radius: 20px; padding: 20px; display: flex; align-items: center; gap: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .product-image-placeholder { width: 80px; height: 80px; background: #2c2c2e; border-radius: 12px; display: flex; justify-content: center; align-items: center; }
+        .status-info { display: flex; flex-direction: column; gap: 4px; }
+        .status-label { font-size: 13px; color: var(--secondary-text); text-transform: uppercase; font-weight: 600; }
+        .status-value { font-size: 20px; font-weight: 600; }
+        .streak-7d { font-size: 14px; color: var(--secondary-text); margin-top: 4px; }
+        .emergency-alert { color: #ff453a; font-size: 12px; font-weight: 600; margin-top: 4px; display: none; }
+        .banner-wrap { position: fixed; bottom: 0; width: 100%; background: #111; padding: 18px 0; border-top: 1px solid #222; overflow: hidden; white-space: nowrap; }
+        .banner-content { display: inline-block; animation: scroll 40s linear infinite; }
+        .banner-stat { display: inline-block; margin-right: 60px; font-size: 15px; color: var(--secondary-text); font-weight: 500; }
+        .banner-stat span { color: var(--bolt-color); font-weight: 700; }
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .unlocked { color: #32d74b; }
+        .locked { color: #ff453a; }
+        .success-text { color: #32d74b; font-size: 48px; }
+        .emergency-text { color: #ff453a; font-size: 42px; }
+        .conn-dot { width: 8px; height: 8px; border-radius: 50%; background: #32d74b; display: inline-block; margin-right: 5px; }
+        .conn-lost { background: #ff453a; }
+    </style>
+</head>
+<body>
+    <div class="menu-overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="side-menu" id="menu">
+        <div class="profile-section">
+            <h3>Me</h3>
+            <div class="friend-item"><span>Focus Streak</span><span class="friend-streak" id="myStreak">7 Days ⚡</span></div>
+            <div class="friend-item"><span>Alerts (7D)</span><span class="friend-streak" id="myAlerts" style="color:#ff453a">0 ⚠️</span></div>
+            <div class="friend-item" style="border-top: 1px solid #333; padding-top: 20px; margin-top: 25px;">
+                <span style="color: var(--secondary-text); font-size: 13px; text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Friends</span>
+            </div>
+            <div id="friendsList"></div>
+        </div>
+    </div>
+    <nav class="top-nav">
+        <div class="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+        <header><h1>LockBox</h1></header>
+        <div id="connStatus" style="position:absolute; right:20px; font-size:10px; color:var(--secondary-text);"><span class="conn-dot" id="dot"></span>LIVE</div>
+    </nav>
+    <div class="mascot-container"><img id="petImage" class="mascot-image" src="" alt="Pet"></div>
+    <div class="timer-container"><div class="timer" id="timer">00:00</div></div>
+    <div class="status-card">
+        <div class="product-image-placeholder">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2">
+                <path d="M21 8l-9-4-9 4v8l9 4 9-4V8zM12 4v16M3 8l9 4 9-4"/>
+            </svg>
+        </div>
+        <div class="status-info">
+            <span class="status-label">Status</span>
+            <span class="status-value unlocked" id="lock-status">UNLOCKED</span>
+            <span class="streak-7d" id="streakDisplay">7D Streak: 7 days</span>
+            <div class="emergency-alert" id="emergencyIndicator">⚠️ Emergency Triggered</div>
+        </div>
+    </div>
+    <div class="banner-wrap"><div class="banner-content" id="banner"></div></div>
+    <script>
+        const FRIENDS = [{ name: "Alex", streak: 12 }, { name: "Sam", streak: 5 }, { name: "Jordan", streak: 21 }, { name: "Riley", streak: 8 }, { name: "Taylor", streak: 14 }];
+        let overlayActive = false;
+        function toggleMenu() { document.getElementById('menu').classList.toggle('active'); document.getElementById('overlay').style.display = document.getElementById('menu').classList.contains('active') ? 'block' : 'none'; }
+        function init() {
+            const list = document.getElementById('friendsList'); const banner = document.getElementById('banner'); let bHTML = "";
+            FRIENDS.forEach(f => { list.innerHTML += `<div class="friend-item"><span>${f.name}</span><span class="friend-streak">${f.streak}⚡</span></div>`; bHTML += `<span class="banner-stat">${f.name} is focusing! <span>${f.streak}D Streak</span></span>`; });
+            banner.innerHTML = bHTML + bHTML + bHTML;
+        }
+        function update() {
+            // STABILITY: Cache-busting parameter for laptop browsers
+            fetch('/api/status?t=' + Date.now()).then(r => r.json()).then(data => {
+                const dot = document.getElementById('dot');
+                if (data.lastUpdate > 3000) dot.className = "conn-dot conn-lost"; else dot.className = "conn-dot";
+                
+                if (!overlayActive) {
+                    const timerElem = document.getElementById('timer');
+                    if (data.state === 4) {
+                        timerElem.innerText = "SUCCESS!"; timerElem.className = "timer success-text"; overlayActive = true;
+                        setTimeout(() => { overlayActive = false; timerElem.className = "timer"; timerElem.innerText = "00:00"; }, 4000);
+                    } else if (data.state === 5) {
+                        timerElem.innerText = "EMERGENCY!"; timerElem.className = "timer emergency-text"; document.getElementById('emergencyIndicator').style.display = "block"; overlayActive = true;
+                        setTimeout(() => { overlayActive = false; timerElem.className = "timer"; timerElem.innerText = "00:00"; }, 4000);
+                    } else {
+                        timerElem.innerText = `${String(data.minutes).padStart(2,'0')}:${String(data.seconds).padStart(2,'0')}`;
+                        timerElem.className = "timer";
+                        if (data.state < 3) document.getElementById('emergencyIndicator').style.display = "none";
+                    }
+                }
+                const lockElem = document.getElementById('lock-status');
+                lockElem.innerText = data.isLocked ? "LOCKED" : "UNLOCKED";
+                lockElem.className = `status-value ${data.isLocked ? 'locked' : 'unlocked'}`;
+                const s = Math.max(0, 7 - Math.floor(data.emergencyCount / 2));
+                document.getElementById('streakDisplay').innerText = `7D Streak: ${s} days`;
+                document.getElementById('myStreak').innerText = `${s} Days ⚡`;
+                document.getElementById('myAlerts').innerText = `${data.emergencyCount} ⚠️`;
+            }).catch(() => document.getElementById('dot').className = "conn-dot conn-lost");
+        }
+        init(); setInterval(update, 400); 
+    </script>
+</body>
+</html>
+)rawliteral";
+  server.send(200, "text/html", html);
+}
