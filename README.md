@@ -4,7 +4,7 @@ LockBox is a hardware-integrated focus tool designed to help students and profes
 
 ---
 
-## 🛠 Hardware Requirements
+## Hardware Requirements
 
 ### Main Controller
 - **Grove Beginner Kit for Arduino** (Includes Arduino Uno, OLED, LED, Buzzer, Button, and Potentiometer).
@@ -20,7 +20,7 @@ LockBox is a hardware-integrated focus tool designed to help students and profes
 
 ---
 
-## 🔌 Wiring Diagram
+## Wiring Diagram
 
 ### 1. External Components (Grove Board)
 | Component | Pin | Note |
