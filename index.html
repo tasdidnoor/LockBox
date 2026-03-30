@@ -3,231 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LockBox Dashboard Preview</title>
+    <title>LockBox Dashboard</title>
     <style>
-        :root {
-            --bg-color: #000000;
-            --text-color: #ffffff;
-            --secondary-text: #86868b;
-            --card-bg: #1c1c1e;
-            --accent-color: #007aff;
-            --bolt-color: #ffd60a;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-x: hidden;
-            padding-top: 5px;
-        }
-
-        /* --- Menu System --- */
-        .top-nav {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            padding: 15px 20px;
-            margin-bottom: 0;
-        }
-
-        .menu-btn {
-            cursor: pointer;
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            padding: 5px;
-        }
-
-        .menu-btn span {
-            display: block;
-            width: 24px;
-            height: 2px;
-            background: white;
-            border-radius: 2px;
-        }
-
-        .side-menu {
-            position: fixed;
-            top: 0;
-            left: -280px;
-            width: 280px;
-            height: 100%;
-            background: rgba(20, 20, 20, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            z-index: 200;
-            padding: 60px 24px;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border-right: 1px solid #333;
-            box-shadow: 10px 0 30px rgba(0,0,0,0.5);
-        }
-
+        :root { --bg-color: #000000; --text-color: #ffffff; --secondary-text: #86868b; --card-bg: #1c1c1e; --accent-color: #007aff; --bolt-color: #ffd60a; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); min-height: 100vh; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; padding-top: 5px; }
+        .top-nav { width: 100%; display: flex; align-items: center; padding: 15px 20px; margin-bottom: 0; position: relative; }
+        .menu-btn { cursor: pointer; z-index: 100; display: flex; flex-direction: column; gap: 5px; padding: 5px; }
+        .menu-btn span { display: block; width: 24px; height: 2px; background: white; border-radius: 2px; }
+        .side-menu { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(20px); z-index: 200; padding: 60px 24px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); border-right: 1px solid #333; }
         .side-menu.active { left: 0; }
-
-        .menu-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            z-index: 150;
-        }
-
-        .profile-section h3 { 
-            font-size: 24px; 
-            font-weight: 700;
-            margin-bottom: 25px; 
-            color: #fff;
-        }
-
-        .friend-item { 
-            display: flex; 
-            justify-content: space-between; 
-            margin-bottom: 18px; 
-            font-size: 16px;
-            font-weight: 500;
-        }
-
+        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; z-index: 150; }
+        .profile-section h3 { font-size: 24px; font-weight: 700; margin-bottom: 25px; color: #fff; }
+        .friend-item { display: flex; justify-content: space-between; margin-bottom: 18px; font-size: 16px; font-weight: 500; }
         .friend-streak { color: var(--bolt-color); font-weight: 700; }
-
-        /* --- Layout --- */
-        header h1 { 
-            font-size: 22px; 
-            font-weight: 600; 
-            letter-spacing: -0.5px;
-            margin-left: 15px;
-        }
-
-        .mascot-container {
-            width: 200px;
-            height: 200px;
-            margin: 10px auto;
-            background: #111;
-            border-radius: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 1px solid #333;
-            overflow: hidden;
-        }
-
+        header h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; margin-left: 15px; }
+        .mascot-container { width: 200px; height: 200px; margin: 10px auto; background: #111; border-radius: 20px; display: flex; justify-content: center; align-items: center; border: 1px solid #333; overflow: hidden; }
         .mascot-image { width: 100%; height: 100%; object-fit: contain; }
-
-        .timer-container { text-align: center; margin-bottom: 15px; }
+        .timer-container { text-align: center; margin-bottom: 15px; min-height: 100px; display: flex; align-items: center; justify-content: center; }
         .timer { font-size: 84px; font-weight: 700; letter-spacing: -2px; font-variant-numeric: tabular-nums; }
-
-        .status-card {
-            background-color: var(--card-bg);
-            width: 90%;
-            max-width: 350px;
-            border-radius: 20px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .product-image-placeholder {
-            width: 80px;
-            height: 80px;
-            background: #2c2c2e;
-            border-radius: 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
+        .status-card { background-color: var(--card-bg); width: 90%; max-width: 350px; border-radius: 20px; padding: 20px; display: flex; align-items: center; gap: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .product-image-placeholder { width: 80px; height: 80px; background: #2c2c2e; border-radius: 12px; display: flex; justify-content: center; align-items: center; }
         .status-info { display: flex; flex-direction: column; gap: 4px; }
         .status-label { font-size: 13px; color: var(--secondary-text); text-transform: uppercase; font-weight: 600; }
         .status-value { font-size: 20px; font-weight: 600; }
         .streak-7d { font-size: 14px; color: var(--secondary-text); margin-top: 4px; }
-
-        /* --- Seamless Banner --- */
-        .banner-wrap {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: #111;
-            padding: 18px 0;
-            border-top: 1px solid #222;
-            overflow: hidden;
-            white-space: nowrap;
-        }
-
-        .banner-content {
-            display: inline-block;
-            animation: scroll 40s linear infinite;
-        }
-
-        .banner-stat {
-            display: inline-block;
-            margin-right: 60px;
-            font-size: 15px;
-            color: var(--secondary-text);
-            font-weight: 500;
-        }
-
+        .emergency-alert { color: #ff453a; font-size: 12px; font-weight: 600; margin-top: 4px; display: none; }
+        .banner-wrap { position: fixed; bottom: 0; width: 100%; background: #111; padding: 18px 0; border-top: 1px solid #222; overflow: hidden; white-space: nowrap; }
+        .banner-content { display: inline-block; animation: scroll 40s linear infinite; }
+        .banner-stat { display: inline-block; margin-right: 60px; font-size: 15px; color: var(--secondary-text); font-weight: 500; }
         .banner-stat span { color: var(--bolt-color); font-weight: 700; }
-
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
         .unlocked { color: #32d74b; }
         .locked { color: #ff453a; }
+        .success-text { color: #32d74b; font-size: 48px; }
+        .emergency-text { color: #ff453a; font-size: 42px; }
+        .conn-dot { width: 8px; height: 8px; border-radius: 50%; background: #32d74b; display: inline-block; margin-right: 5px; }
+        .conn-lost { background: #ff453a; }
     </style>
 </head>
 <body>
-
     <div class="menu-overlay" id="overlay" onclick="toggleMenu()"></div>
-    
     <div class="side-menu" id="menu">
         <div class="profile-section">
             <h3>Me</h3>
-            <div class="friend-item">
-                <span>Focus Streak</span>
-                <span class="friend-streak">7 Days ⚡</span>
-            </div>
+            <div class="friend-item"><span>Focus Streak</span><span class="friend-streak" id="myStreak">7 Days ⚡</span></div>
+            <div class="friend-item"><span>Alerts (7D)</span><span class="friend-streak" id="myAlerts" style="color:#ff453a">0 ⚠️</span></div>
             <div class="friend-item" style="border-top: 1px solid #333; padding-top: 20px; margin-top: 25px;">
                 <span style="color: var(--secondary-text); font-size: 13px; text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Friends</span>
             </div>
             <div id="friendsList"></div>
         </div>
     </div>
-
     <nav class="top-nav">
-        <div class="menu-btn" onclick="toggleMenu()">
-            <span></span><span></span><span></span>
-        </div>
+        <div class="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></div>
         <header><h1>LockBox</h1></header>
-        <div style="width:34px"></div>
+        <div id="connStatus" style="position:absolute; right:20px; font-size:10px; color:var(--secondary-text);"><span class="conn-dot" id="dot"></span>LIVE</div>
     </nav>
-
-    <div class="mascot-container">
-        <img id="petImage" class="mascot-image" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" alt="Pet">
-    </div>
-
-    <div class="timer-container">
-        <div class="timer" id="timer">25:00</div>
-    </div>
-
+    <div class="mascot-container"><img id="petImage" class="mascot-image" src="" alt="Pet"></div>
+    <div class="timer-container"><div class="timer" id="timer">00:00</div></div>
     <div class="status-card">
         <div class="product-image-placeholder">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2">
@@ -238,53 +72,49 @@
             <span class="status-label">Status</span>
             <span class="status-value unlocked" id="lock-status">UNLOCKED</span>
             <span class="streak-7d" id="streakDisplay">7D Streak: 7 days</span>
+            <div class="emergency-alert" id="emergencyIndicator">⚠️ Emergency Triggered</div>
         </div>
     </div>
-
-    <div class="banner-wrap">
-        <div class="banner-content" id="banner"></div>
-    </div>
-
+    <div class="banner-wrap"><div class="banner-content" id="banner"></div></div>
     <script>
-        const FRIENDS = [
-            { name: "Alex", streak: 12 },
-            { name: "Sam", streak: 5 },
-            { name: "Jordan", streak: 21 },
-            { name: "Riley", streak: 8 },
-            { name: "Taylor", streak: 14 }
-        ];
-
-        function toggleMenu() {
-            const menu = document.getElementById('menu');
-            const overlay = document.getElementById('overlay');
-            menu.classList.toggle('active');
-            overlay.style.display = menu.classList.contains('active') ? 'block' : 'none';
-        }
-
+        const FRIENDS = [{ name: "Alex", streak: 12 }, { name: "Sam", streak: 5 }, { name: "Jordan", streak: 21 }, { name: "Riley", streak: 8 }, { name: "Taylor", streak: 14 }];
+        let overlayActive = false;
+        function toggleMenu() { document.getElementById('menu').classList.toggle('active'); document.getElementById('overlay').style.display = document.getElementById('menu').classList.contains('active') ? 'block' : 'none'; }
         function init() {
-            const list = document.getElementById('friendsList');
-            const banner = document.getElementById('banner');
-            let bannerHTML = "";
-
-            FRIENDS.forEach(f => {
-                list.innerHTML += `<div class="friend-item"><span>${f.name}</span><span class="friend-streak">${f.streak}⚡</span></div>`;
-                bannerHTML += `<span class="banner-stat">${f.name} is focusing! <span>${f.streak}D Streak</span></span>`;
-            });
-            
-            // Duplicate content twice for extra smoothness and no gaps
-            banner.innerHTML = bannerHTML + bannerHTML + bannerHTML;
+            const list = document.getElementById('friendsList'); const banner = document.getElementById('banner'); let bHTML = "";
+            FRIENDS.forEach(f => { list.innerHTML += `<div class="friend-item"><span>${f.name}</span><span class="friend-streak">${f.streak}⚡</span></div>`; bHTML += `<span class="banner-stat">${f.name} is focusing! <span>${f.streak}D Streak</span></span>`; });
+            banner.innerHTML = bHTML + bHTML + bHTML;
         }
-
-        // Mock updates for preview
-        let timeLeft = 1500;
-        setInterval(() => {
-            if(timeLeft > 0) timeLeft--;
-            const mins = Math.floor(timeLeft / 60);
-            const secs = timeLeft % 60;
-            document.getElementById('timer').innerText = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
-        }, 1000);
-
-        init();
+        function update() {
+            // STABILITY: Cache-busting parameter for laptop browsers
+            fetch('/api/status?t=' + Date.now()).then(r => r.json()).then(data => {
+                const dot = document.getElementById('dot');
+                if (data.lastUpdate > 3000) dot.className = "conn-dot conn-lost"; else dot.className = "conn-dot";
+                
+                if (!overlayActive) {
+                    const timerElem = document.getElementById('timer');
+                    if (data.state === 4) {
+                        timerElem.innerText = "SUCCESS!"; timerElem.className = "timer success-text"; overlayActive = true;
+                        setTimeout(() => { overlayActive = false; timerElem.className = "timer"; timerElem.innerText = "00:00"; }, 4000);
+                    } else if (data.state === 5) {
+                        timerElem.innerText = "EMERGENCY!"; timerElem.className = "timer emergency-text"; document.getElementById('emergencyIndicator').style.display = "block"; overlayActive = true;
+                        setTimeout(() => { overlayActive = false; timerElem.className = "timer"; timerElem.innerText = "00:00"; }, 4000);
+                    } else {
+                        timerElem.innerText = `${String(data.minutes).padStart(2,'0')}:${String(data.seconds).padStart(2,'0')}`;
+                        timerElem.className = "timer";
+                        if (data.state < 3) document.getElementById('emergencyIndicator').style.display = "none";
+                    }
+                }
+                const lockElem = document.getElementById('lock-status');
+                lockElem.innerText = data.isLocked ? "LOCKED" : "UNLOCKED";
+                lockElem.className = `status-value ${data.isLocked ? 'locked' : 'unlocked'}`;
+                const s = Math.max(0, 7 - Math.floor(data.emergencyCount / 2));
+                document.getElementById('streakDisplay').innerText = `7D Streak: ${s} days`;
+                document.getElementById('myStreak').innerText = `${s} Days ⚡`;
+                document.getElementById('myAlerts').innerText = `${data.emergencyCount} ⚠️`;
+            }).catch(() => document.getElementById('dot').className = "conn-dot conn-lost");
+        }
+        init(); setInterval(update, 400); 
     </script>
 </body>
 </html>
