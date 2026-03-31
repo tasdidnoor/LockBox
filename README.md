@@ -102,7 +102,7 @@ The dashboard is designed with **Glassmorphism** and Apple-inspired UI elements:
 | | | | |
 | :---: | :---: | :---: | :---: |
 | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/BoxView.jpg" width="200" /> | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/HingeView.jpg" width="200" /> | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/TopView.jpg" width="200" /> | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/Components.jpg" width="200" /> |
-| Side View | Hinge Detail | Top-Down View | Internal Components |
+| Inside View | Hinge Detail | Top-Down View | Internal Components |
 
 ### User Interface States
 | | | | |
@@ -110,5 +110,5 @@ The dashboard is designed with **Glassmorphism** and Apple-inspired UI elements:
 | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/Dashboard2.png" width="200" /> | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/Dashboard3.png" width="200" /> | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/Dashboard4.png" width="200" /> | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/OLED2.jpg" width="200" /> |
 | Locked State | Success Screen | Emergency Trigger | Timer Selection |
 | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/OLED3.jpg" width="200" /> | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/OLED5.jpg" width="200" /> | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/OLED6.jpg" width="200" /> | |
-| Countdown (3) | Countdown (1) | Success UI | |
+| Time Selection | Time Remaining | Ready UI | |
 
