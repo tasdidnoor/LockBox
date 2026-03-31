@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LockBox Demo Dashboard</title>
+    <title>LockBox Dashboard</title>
     <style>
         :root { --bg-color: #000000; --text-color: #ffffff; --secondary-text: #86868b; --card-bg: #1c1c1e; --accent-color: #007aff; --bolt-color: #ffd60a; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; }
@@ -23,8 +23,7 @@
         .timer-container { text-align: center; margin-bottom: 15px; min-height: 100px; display: flex; align-items: center; justify-content: center; }
         .timer { font-size: 84px; font-weight: 700; letter-spacing: -2px; font-variant-numeric: tabular-nums; }
         .status-card { background-color: var(--card-bg); width: 90%; max-width: 350px; border-radius: 20px; padding: 20px; display: flex; align-items: center; gap: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
-        .product-image-placeholder { width: 80px; height: 80px; background: #2c2c2e; border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-        .product-image { width: 100%; height: 100%; object-fit: cover; }
+        .product-image-placeholder { width: 80px; height: 80px; background: #2c2c2e; border-radius: 12px; display: flex; justify-content: center; align-items: center; }
         .status-info { display: flex; flex-direction: column; gap: 4px; }
         .status-label { font-size: 13px; color: var(--secondary-text); text-transform: uppercase; font-weight: 600; }
         .status-value { font-size: 20px; font-weight: 600; }
@@ -39,6 +38,8 @@
         .locked { color: #ff453a; }
         .success-text { color: #32d74b; font-size: 48px; }
         .emergency-text { color: #ff453a; font-size: 42px; }
+        .conn-dot { width: 8px; height: 8px; border-radius: 50%; background: #32d74b; display: inline-block; margin-right: 5px; }
+        .conn-lost { background: #ff453a; }
     </style>
 </head>
 <body>
@@ -46,111 +47,74 @@
     <div class="side-menu" id="menu">
         <div class="profile-section">
             <h3>Me</h3>
-            <div class="friend-item"><span>Focus Streak</span><span class="friend-streak" id="myStreak">0 Days ⚡</span></div>
+            <div class="friend-item"><span>Focus Streak</span><span class="friend-streak" id="myStreak">7 Days ⚡</span></div>
             <div class="friend-item"><span>Alerts (7D)</span><span class="friend-streak" id="myAlerts" style="color:#ff453a">0 ⚠️</span></div>
+            <div class="friend-item" style="border-top: 1px solid #333; padding-top: 20px; margin-top: 25px;">
+                <span style="color: var(--secondary-text); font-size: 13px; text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Friends</span>
+            </div>
             <div id="friendsList"></div>
         </div>
     </div>
     <nav class="top-nav">
         <div class="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></div>
         <header><h1>LockBox</h1></header>
+        <div id="connStatus" style="position:absolute; right:20px; font-size:10px; color:var(--secondary-text);"><span class="conn-dot" id="dot"></span>LIVE</div>
     </nav>
-    <div class="mascot-container"><img id="petImage" class="mascot-image" src="Media/Idle2.png" alt="Pet"></div>
+    <div class="mascot-container"><img id="petImage" class="mascot-image" src="" alt="Pet"></div>
     <div class="timer-container"><div class="timer" id="timer">00:00</div></div>
     <div class="status-card">
         <div class="product-image-placeholder">
-            <img id="boxImg" class="product-image" src="Media/BlackBox.png" alt="Box">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2">
+                <path d="M21 8l-9-4-9 4v8l9 4 9-4V8zM12 4v16M3 8l9 4 9-4"/>
+            </svg>
         </div>
         <div class="status-info">
             <span class="status-label">Status</span>
             <span class="status-value unlocked" id="lock-status">UNLOCKED</span>
-            <span class="streak-7d" id="streakDisplay">Focus Streak: 0 days</span>
+            <span class="streak-7d" id="streakDisplay">7D Streak: 7 days</span>
             <div class="emergency-alert" id="emergencyIndicator">⚠️ Emergency Triggered</div>
         </div>
     </div>
     <div class="banner-wrap"><div class="banner-content" id="banner"></div></div>
     <script>
         const FRIENDS = [{ name: "Alex", streak: 12 }, { name: "Sam", streak: 5 }, { name: "Jordan", streak: 21 }, { name: "Riley", streak: 8 }, { name: "Taylor", streak: 14 }];
-        const IDLE_ANIM = ["Media/Idle2.png", "Media/Idle3.png", "Media/Idle4.png"];
-        const STUDY_IMG = "Media/Study.jpg";
-        const SUCCESS_IMG = "Media/Success.jpg";
-        const EMERGENCY_IMG = "Media/Idle.jpg";
-        
-        let demoState = 0; 
-        let demoStartTime = Date.now();
-        let emergencyCounter = 0;
-        let streakCounter = 0;
-        let alertedThisLoop = false;
-        let succeededThisLoop = false;
-
+        let overlayActive = false;
         function toggleMenu() { document.getElementById('menu').classList.toggle('active'); document.getElementById('overlay').style.display = document.getElementById('menu').classList.contains('active') ? 'block' : 'none'; }
         function init() {
             const list = document.getElementById('friendsList'); const banner = document.getElementById('banner'); let bHTML = "";
             FRIENDS.forEach(f => { list.innerHTML += `<div class="friend-item"><span>${f.name}</span><span class="friend-streak">${f.streak}⚡</span></div>`; bHTML += `<span class="banner-stat">${f.name} is focusing! <span>${f.streak}D Streak</span></span>`; });
             banner.innerHTML = bHTML + bHTML + bHTML;
         }
-
-        function updateDemo() {
-            let now = Date.now();
-            let elapsed = (now - demoStartTime) / 1000;
-            const petImg = document.getElementById('petImage');
-            const timerElem = document.getElementById('timer');
-            const lockElem = document.getElementById('lock-status');
-            const emerElem = document.getElementById('emergencyIndicator');
-
-            if (demoState === 0) { // Idle 5s (Cycle Idle2,3,4)
-                let frame = Math.floor(elapsed / 0.5) % IDLE_ANIM.length;
-                petImg.src = IDLE_ANIM[frame];
-                timerElem.innerText = "00:00"; timerElem.className = "timer";
-                lockElem.innerText = "UNLOCKED"; lockElem.className = "status-value unlocked";
-                emerElem.style.display = "none";
-                alertedThisLoop = false; succeededThisLoop = false;
-                if (elapsed >= 5) { demoState = 1; demoStartTime = now; }
-            } else if (demoState === 1) { // Success Demo Running 5s
-                let remaining = Math.max(0, 5 - Math.floor(elapsed));
-                petImg.src = STUDY_IMG;
-                timerElem.innerText = `00:0${remaining}`;
-                lockElem.innerText = "LOCKED"; lockElem.className = "status-value locked";
-                if (elapsed >= 5) { demoState = 2; demoStartTime = now; }
-            } else if (demoState === 2) { // Success End 5s
-                if (!succeededThisLoop) {
-                    streakCounter++;
-                    document.getElementById('myStreak').innerText = `${streakCounter} Days ⚡`;
-                    document.getElementById('streakDisplay').innerText = `Focus Streak: ${streakCounter} days`;
-                    succeededThisLoop = true;
+        function update() {
+            // STABILITY: Cache-busting parameter for laptop browsers
+            fetch('/api/status?t=' + Date.now()).then(r => r.json()).then(data => {
+                const dot = document.getElementById('dot');
+                if (data.lastUpdate > 3000) dot.className = "conn-dot conn-lost"; else dot.className = "conn-dot";
+                
+                if (!overlayActive) {
+                    const timerElem = document.getElementById('timer');
+                    if (data.state === 4) {
+                        timerElem.innerText = "SUCCESS!"; timerElem.className = "timer success-text"; overlayActive = true;
+                        setTimeout(() => { overlayActive = false; timerElem.className = "timer"; timerElem.innerText = "00:00"; }, 4000);
+                    } else if (data.state === 5) {
+                        timerElem.innerText = "EMERGENCY!"; timerElem.className = "timer emergency-text"; document.getElementById('emergencyIndicator').style.display = "block"; overlayActive = true;
+                        setTimeout(() => { overlayActive = false; timerElem.className = "timer"; timerElem.innerText = "00:00"; }, 4000);
+                    } else {
+                        timerElem.innerText = `${String(data.minutes).padStart(2,'0')}:${String(data.seconds).padStart(2,'0')}`;
+                        timerElem.className = "timer";
+                        if (data.state < 3) document.getElementById('emergencyIndicator').style.display = "none";
+                    }
                 }
-                petImg.src = SUCCESS_IMG;
-                timerElem.innerText = "SUCCESS!"; timerElem.className = "timer success-text";
-                lockElem.innerText = "UNLOCKED"; lockElem.className = "status-value unlocked";
-                if (elapsed >= 5) { demoState = 3; demoStartTime = now; }
-            } else if (demoState === 3) { // Idle2 5s
-                let frame = Math.floor(elapsed / 0.5) % IDLE_ANIM.length;
-                petImg.src = IDLE_ANIM[frame];
-                timerElem.innerText = "00:00"; timerElem.className = "timer";
-                lockElem.innerText = "UNLOCKED"; lockElem.className = "status-value unlocked";
-                if (elapsed >= 5) { demoState = 4; demoStartTime = now; }
-            } else if (demoState === 4) { // Emergency Demo Running 5s
-                let totalSec = 600 - Math.floor(elapsed);
-                let mins = Math.floor(totalSec / 60);
-                let secs = totalSec % 60;
-                petImg.src = STUDY_IMG;
-                timerElem.innerText = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
-                lockElem.innerText = "LOCKED"; lockElem.className = "status-value locked";
-                if (elapsed >= 5) { demoState = 5; demoStartTime = now; }
-            } else if (demoState === 5) { // Emergency End 5s
-                if (!alertedThisLoop) {
-                    emergencyCounter++;
-                    document.getElementById('myAlerts').innerText = `${emergencyCounter} ⚠️`;
-                    alertedThisLoop = true;
-                }
-                petImg.src = EMERGENCY_IMG;
-                timerElem.innerText = "EMERGENCY!"; timerElem.className = "timer emergency-text";
-                lockElem.innerText = "UNLOCKED"; lockElem.className = "status-value unlocked";
-                emerElem.style.display = "block";
-                if (elapsed >= 5) { demoState = 0; demoStartTime = now; }
-            }
+                const lockElem = document.getElementById('lock-status');
+                lockElem.innerText = data.isLocked ? "LOCKED" : "UNLOCKED";
+                lockElem.className = `status-value ${data.isLocked ? 'locked' : 'unlocked'}`;
+                const s = Math.max(0, 7 - Math.floor(data.emergencyCount / 2));
+                document.getElementById('streakDisplay').innerText = `7D Streak: ${s} days`;
+                document.getElementById('myStreak').innerText = `${s} Days ⚡`;
+                document.getElementById('myAlerts').innerText = `${data.emergencyCount} ⚠️`;
+            }).catch(() => document.getElementById('dot').className = "conn-dot conn-lost");
         }
-        init(); setInterval(updateDemo, 100);
+        init(); setInterval(update, 400); 
     </script>
 </body>
 </html>
