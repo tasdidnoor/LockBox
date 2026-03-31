@@ -2,7 +2,7 @@
 
 LockBox is a hardware-integrated focus tool designed to help students and professionals stay off their phones. You place your phone in the box, set a timer, and the box remains physically locked until the session is complete. It features a high-end, Apple-inspired web dashboard for real-time tracking and social "streak" sharing.
 
-Live Demo: `https://tasdidnoor.com/LockBox/`
+Live Demo: **[tasdidnoor.com/LockBox/](https://tasdidnoor.com/LockBox)**
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/MainView.jpg" width="32%" alt="Physical Box" />
