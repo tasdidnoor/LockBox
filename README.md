@@ -4,6 +4,12 @@ LockBox is a hardware-integrated focus tool designed to help students and profes
 
 Live Demo: `https://tasdidnoor.com/LockBox/`
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/MainView.jpg" width="32%" alt="Physical Box" />
+  <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/OLED1.jpg" width="32%" alt="OLED Screen" />
+  <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/Dashboard1.png" width="32%" alt="Web Dashboard" />
+</p>
+
 ---
 
 ## Hardware Requirements
@@ -87,3 +93,22 @@ The dashboard is designed with **Glassmorphism** and Apple-inspired UI elements:
 - **Dynamic Mascot:** Visual feedback based on your study state.
 - **Social Banner:** A smooth-scrolling banner showing friend activity and streaks.
 - **Live Indicator:** A heartbeat dot showing active communication between hardware and software.
+
+---
+
+## 📸 Media Gallery
+
+### Hardware & Build Details
+| | | | |
+| :---: | :---: | :---: | :---: |
+| <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/BoxView.jpg" width="200" /> | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/HingeView.jpg" width="200" /> | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/TopView.jpg" width="200" /> | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/Components.jpg" width="200" /> |
+| Side View | Hinge Detail | Top-Down View | Internal Components |
+
+### User Interface States
+| | | | |
+| :---: | :---: | :---: | :---: |
+| <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/Dashboard2.png" width="200" /> | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/Dashboard3.png" width="200" /> | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/Dashboard4.png" width="200" /> | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/OLED2.jpg" width="200" /> |
+| Locked State | Success Screen | Emergency Trigger | Timer Selection |
+| <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/OLED3.jpg" width="200" /> | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/OLED5.jpg" width="200" /> | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/OLED6.jpg" width="200" /> | |
+| Countdown (3) | Countdown (1) | Success UI | |
+
