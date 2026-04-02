@@ -114,3 +114,4 @@ The dashboard is designed with **Glassmorphism** and Apple-inspired UI elements:
 | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/OLED3.jpg" width="200" /> | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/OLED5.jpg" width="200" /> | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/OLED6.jpg" width="200" /> | |
 | Time Selection | Time Remaining | Ready UI | |
 
+This project is licensed under the MIT License - see the LICENSE file for details.
