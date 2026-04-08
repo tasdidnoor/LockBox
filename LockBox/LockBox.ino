@@ -15,8 +15,8 @@
 U8G2_SSD1306_128X64_NONAME_1_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE);
 
 // Servo Positions
-#define SERVO_LOCKED 0
-#define SERVO_UNLOCKED 90
+#define SERVO_LOCKED 90
+#define SERVO_UNLOCKED 180
 
 // States (Aligned with ESP32 Dashboard)
 #define STATE_WELCOME 0
