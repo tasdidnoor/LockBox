@@ -11,6 +11,9 @@ Live Demo: `https://tasdidnoor.com/LockBox/`
 <p align="center">
   <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/Dashboard1.png" width="97%" alt="Web Dashboard" />
 </p>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/LockBox_InitSketch.png" width="97%" alt="Initial Sketch" />
+</p>
 
 ---
 
