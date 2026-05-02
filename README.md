@@ -5,7 +5,7 @@ LockBox is a hardware-integrated focus tool designed to help students and profes
 Live Demo: `https://tasdidnoor.com/LockBox/`
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/MainView.jpg" width="48%" alt="Physical Box" />
+  <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/MainView.png" width="48%" alt="Physical Box" />
   <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/OLED1.jpg" width="48%" alt="OLED Screen" />
 </p>
 <p align="center">
@@ -106,7 +106,7 @@ The dashboard is designed with **Glassmorphism** and Apple-inspired UI elements:
 ### Hardware & Build Details
 | | | | |
 | :---: | :---: | :---: | :---: |
-| <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/BoxView.jpg" width="200" /> | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/HingeView.jpg" width="200" /> | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/TopView.jpg" width="200" /> | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/Components.jpg" width="200" /> |
+| <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/BoxView.jpg" width="200" /> | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/HingeView.png" width="200" /> | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/TopView.jpg" width="200" /> | <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/Components.jpg" width="200" /> |
 | Inside View | Hinge Detail | Top-Down View | Internal Components |
 
 ### User Interface States
