@@ -6,7 +6,7 @@ Live Demo: `https://tasdidnoor.com/LockBox/`
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/MainView.png" width="48%" alt="Physical Box" />
-  <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/OLED1.jpg" width="48%" alt="OLED Screen" />
+  <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/OLED1.png" width="48%" alt="OLED Screen" />
 </p>
 <p align="center">
   <img src="https://raw.githubusercontent.com/tasdidnoor/Assets/main/LockBox/Dashboard1.png" width="97%" alt="Web Dashboard" />
