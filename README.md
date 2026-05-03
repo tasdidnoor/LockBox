@@ -101,7 +101,7 @@ The dashboard is designed with **Glassmorphism** and Apple-inspired UI elements:
 
 ---
 
-## 📸 Media Gallery
+## Media Gallery
 
 ### Hardware & Build Details
 | | | | |
